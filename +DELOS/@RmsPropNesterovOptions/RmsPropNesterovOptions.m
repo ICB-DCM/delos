@@ -56,7 +56,7 @@ classdef RmsPropNesterovOptions < DELOS.GeneralOptions
                     if isprop(output, inputfields{iField})
                         output.(inputfields{iField}) = input.(inputfields{iField});
                     else
-                        error(['Can not assign property ' inputfields(iField) ' to an instance of RmsPropNesterovOptions.']);
+                        error(['Can not assign property ' inputfields{iField} ' to an instance of RmsPropNesterovOptions.']);
                     end
                 end
                 
