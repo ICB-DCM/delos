@@ -50,7 +50,7 @@ classdef DelosProblem < matlab.mixin.CustomDisplay
     end
     
     methods
-        function Problem = DelosProblem(inObjFun, inPar, inLowerBounds, inUpperBounds)
+        function Problem = DelosProblem(inObjFun, inPar, inLowerBounds, inUpperBounds, inMiniBatchIndices)
             % DelosResults contains the information coming from an
             % optimization with DeLOS.
             %
@@ -61,12 +61,13 @@ classdef DelosProblem < matlab.mixin.CustomDisplay
             %  Results: DelosResults object
             
             % Assign results from optimization
-            Problem.objectiveFun = inObjFun;
-            Problem.initCPUTime  = cputime;
-            Problem.lowerBounds  = inLowerBounds;
-            Problem.upperBounds  = inUpperBounds;
-            Problem.nPar         = length(inPar);
-            Problem.initPar      = inPar;
+            Problem.objectiveFun     = inObjFun;
+            Problem.initCPUTime      = cputime;
+            Problem.lowerBounds      = inLowerBounds;
+            Problem.upperBounds      = inUpperBounds;
+            Problem.nPar             = length(inPar);
+            Problem.initPar          = inPar;
+            Problem.miniBatchIndices = inMiniBatchIndices;
         end
         
         function Optimizer = setupOptimizer(this, Options)

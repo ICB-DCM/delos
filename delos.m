@@ -1,4 +1,4 @@
-function Results = delos(objFun, lowerBounds, upperBounds, initGuess, Options)
+function Results = delos(objFun, lowerBounds, upperBounds, initGuess, Options, minibatches)
     % noodles is the function to call for optimization with Noodles.
     %
     % Input:
@@ -20,7 +20,7 @@ function Results = delos(objFun, lowerBounds, upperBounds, initGuess, Options)
         if (nargin < 4)
             % Create initial guess
             initGuess = 0.5 * (lowerBounds + upperBounds);
-            
+
             if (nargin < 3)
                 % Not enough input arguments
                 error('Not enough input arguments! DeLOS needs at least 3 input arguments (cost function, lower bounds, upper bounds) to work.');
@@ -28,11 +28,24 @@ function Results = delos(objFun, lowerBounds, upperBounds, initGuess, Options)
         end
     end
 
-    % Initialize the problem object for DeLOS
-    Problem = DELOS.DelosProblem(objFun, initGuess(:), lowerBounds(:), upperBounds(:));
-    
     % Handle the options for DeLOS
     Options = DELOS.setupOptions(Options);
+        
+    if (nargin < 6)
+        % Generate minibatches, if necessary
+        if Options.minibatching
+            minibatches = DELOS.generateMiniBatches(...
+                Options.miniBatchSize, ...
+                Options.dataSetSize, ...
+                Options.maxIter, ...
+                Options.maxFunEvals);
+        else
+            minibatches = [];
+        end
+    end
+    
+    % Initialize the problem object for DeLOS
+    Problem = DELOS.DelosProblem(objFun, initGuess(:), lowerBounds(:), upperBounds(:), minibatches);
     
     % Run optimization
     Results = Problem.runOptimization(Options);
