@@ -1,0 +1,7 @@
+*~
+*.fig
+*.mexa64
+*.mexw64
+*.mexmaci64
+*.mexw32
+simulate_*.m
