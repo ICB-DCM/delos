@@ -1,4 +1,4 @@
-function this = intercept(this, Options, bounds)
+function [this, attempt] = intercept(this, Options, bounds)
 
     % Counter for how often optimizer tried to catch up the 
     % parameter update

@@ -1,12 +1,22 @@
 function this = callObjectiveFunction(this, Problem, iteration, nOutput)
+    
+    % Get the current mini batch
+    if this.minibatching
+        if (numel(iteration) == 1)
+            curMinibatch = Problem.miniBatchIndices{iteration};
+        else
+            curMinibatch = iteration;
+        end
+    end
+        
     % Compute cost function value and maybe gradient
     if this.minibatching
         % If mini batch mode should be used, the batch indices must
         % be passed to the cost function
         if (nOutput == 1)
-            newJ = Problem.objectiveFun(this.curPar, Problem.miniBatchIndices{iteration});
+            newJ = Problem.objectiveFun(this.curPar, curMinibatch);
         elseif (nOutput == 2)
-            [newJ, newG] = Problem.objectiveFun(this.curPar, Problem.miniBatchIndices{iteration});
+            [newJ, newG] = Problem.objectiveFun(this.curPar, curMinibatch);
         else
             error('Call to objective function with too many outputs!');
         end

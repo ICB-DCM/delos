@@ -10,6 +10,7 @@ function Results = runOptimization(this, Options)
     Results = this.setupResults(Options);
     
     % Loop over optimization steps
+    funCount = 0;
     for iStep = 1 : Options.maxIter
         %% Compute objective function value and gradient for curPar
         % Make a Nesterov moment step if the given optimizer needs it
@@ -17,9 +18,10 @@ function Results = runOptimization(this, Options)
             Optimizer = Optimizer.lookAhead(Options, iStep);
         end
         
-        % Compute gradient and Hessian to set up he subproblem
+        % Compute objective function value and gradient
         Optimizer = Optimizer.callObjectiveFunction(this, iStep, 2);
-
+        funCount = funCount + 1;
+        
         % Add the barrier function to the objective value and the gradient
         if (~strcmp(Options.barrier, 'none'))
             Optimizer = Optimizer.addBarrier(Options, iStep, 2, [this.lowerBounds, this.upperBounds]);
@@ -31,8 +33,9 @@ function Results = runOptimization(this, Options)
         
         if ~Optimizer.acceptStep
             % Try to resolve the problem with the parameter step
-            Optimizer = Optimizer.intercept(Options, [this.lowerBounds, this.upperBounds]);
-        
+            [Optimizer, attempt] = Optimizer.intercept(Options, [this.lowerBounds, this.upperBounds]);
+            funCount = funCount + attempt;
+            
             % check, if step could be recaptured
             if ~Optimizer.acceptStep
                 Optimizer.abortOptimization();
@@ -66,7 +69,7 @@ function Results = runOptimization(this, Options)
 
     %% Save results and finalize optimization
     % finish up optimization
-    this = this.finishOptimization(Optimizer, Results, iStep);
+    this = this.finishOptimization(Optimizer, Results, iStep, funCount);
     
     % Create output results
     Results = this.saveResults(Results);

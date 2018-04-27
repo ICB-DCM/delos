@@ -47,6 +47,9 @@ classdef DelosProblem < matlab.mixin.CustomDisplay
         
         % set of mini batches
         miniBatchIndices;
+        
+        % set of data indices
+        dataSetIndices;
     end
     
     methods
@@ -99,18 +102,6 @@ classdef DelosProblem < matlab.mixin.CustomDisplay
             Results.normGradTrace = nan(Options.maxIter, 1);
             Results.parameterChangeTrace = nan(Options.maxIter, 1);
             Results.parameterTrace = nan(this.nPar, Options.maxIter);
-        end
-
-        function this = finishOptimization(this, Optimizer, Results, iteration)
-            % Assign results from optimization
-            this.initObj    = Results.objectiveTrace(1);
-            this.finalPar   = Optimizer.curPar;
-            this.finalObj   = Optimizer.curJ;
-            this.finalGrad  = Optimizer.curG;
-            this.iterCount  = iteration;
-            this.funCount   = iteration;
-            this.epochCount = iteration;
-            this.exitflag   = Optimizer.converged;
         end
         
         function Results = saveResults(this, Results)
