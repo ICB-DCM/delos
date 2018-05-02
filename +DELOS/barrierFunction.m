@@ -74,14 +74,14 @@ function [objective, gradient] = softBarrier(objective, gradient, theta, bounds)
         if (theta(iPar) < bounds(iPar, 1))
             objective = objective + ...
                 scale * (bounds(iPar, 1) - theta(iPar))^3;
-            gradient(iPar) = gradient(iPar) + ...
+            gradient(iPar) = gradient(iPar) - ...
                 3 * scale * (bounds(iPar, 1) - theta(iPar))^2;
                 
         % Upper bounds
         elseif (theta(iPar) > bounds(iPar, 2))
             objective = objective + ...
                 scale * (theta(iPar) - bounds(iPar, 2))^3;
-            gradient(iPar) = gradient(iPar) - ...
+            gradient(iPar) = gradient(iPar) + ...
                 3 * scale * (theta(iPar) - bounds(iPar, 2))^2;
             
         end
@@ -101,8 +101,11 @@ function [objective, gradient] = logBarrier(objective, gradient, theta, bounds, 
 % log-posterior, i.e. it is made for minimizing.
 
     % Scaling for barrier, which takes iteration into account
-    scale = 8*(iteration/maxIter) + 2;
-    scale = 10^scale;
+    scale = 12*(iteration/maxIter) + 0;
+    scale = exp(scale);
+    
+    % Correct parameters, if the bounds were violated
+    theta = min(max(theta, bounds(:,1) + 1e-8), bounds(:,2) - 1e-8);
     
     % Parabola, which determines the barrier
     parabola = - (theta - bounds(:,1)) .* (theta - bounds(:,2));
