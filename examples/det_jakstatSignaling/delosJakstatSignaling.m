@@ -106,7 +106,7 @@ options = struct(...
 % initial guess
 initGuess = init;
 
-for iStart = 5
+for iStart = 1:20
     Results(iStart) = delos(objectiveFunction, lb, ub, initGuess(:,iStart), options);
 end
 
