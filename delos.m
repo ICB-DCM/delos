@@ -1,4 +1,4 @@
-function Results = delos(objFun, lowerBounds, upperBounds, initGuess, Options, minibatches)
+function Results = delos(varargin)
     % noodles is the function to call for optimization with Noodles.
     %
     % Input:
@@ -25,8 +25,18 @@ function Results = delos(objFun, lowerBounds, upperBounds, initGuess, Options, m
                 % Not enough input arguments
                 error('Not enough input arguments! DeLOS needs at least 3 input arguments (cost function, lower bounds, upper bounds) to work.');
             end
+        else
+            initGuess = varargin{4};
         end
+    else
+        initGuess = varargin{4};
+        Options = varargin{5};
     end
+
+    % Assign inputs
+    objFun = varargin{1};
+    lowerBounds = varargin{2};
+    upperBounds = varargin{3};
 
     % Handle the options for DeLOS
     Options = DELOS.setupOptions(Options);
@@ -34,18 +44,33 @@ function Results = delos(objFun, lowerBounds, upperBounds, initGuess, Options, m
     if (nargin < 6)
         % Generate minibatches, if necessary
         if Options.minibatching
-            minibatches = DELOS.generateMiniBatches(...
+            [minibatches, dataset] = DELOS.generateMiniBatches(...
                 Options.miniBatchSize, ...
                 Options.dataSetSize, ...
                 Options.maxIter, ...
-                Options.maxFunEvals);
+                Options.maxFunEvals, ...
+                Options.dataSetIndices);
         else
             minibatches = [];
+            dataset = [];
+        end
+    else
+        % Assign input
+        minibatches = varargin{6};
+
+        if (nargin < 7)
+            % Get whole dataset 
+            dataset = sort(minibatches{1});
+            for iBatch = 2 : length(minibatches)
+                dataset = union(dataset, minibatches{iBatch});
+            end
+        else
+            dataset = varargin{7};
         end
     end
     
     % Initialize the problem object for DeLOS
-    Problem = DELOS.DelosProblem(objFun, initGuess(:), lowerBounds(:), upperBounds(:), minibatches);
+    Problem = DELOS.DelosProblem(objFun, initGuess(:), lowerBounds(:), upperBounds(:), minibatches, dataset);
     
     % Run optimization
     Results = Problem.runOptimization(Options);

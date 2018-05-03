@@ -1,10 +1,11 @@
-function miniBatchIndices = generateMiniBatches(nBatch, nData, maxIter, maxFunEvals)
+function [miniBatchIndices, dataSetIndices] = generateMiniBatches(nBatch, nData, maxIter, maxFunEvals)
 
     % Give shorter names to variables... (Readability)
     nSteps = max(maxIter, maxFunEvals) + 1;
     safetyFactor = 2;
     miniBatchIndices = cell(safetyFactor * nSteps, 1);
-
+    dataSetIndices = 1 : nData;
+    
     % How many minibatches are needed? How many epoches?
     % Create some more minibatches if some must be skipped
     subsets = nan(1, safetyFactor * nSteps * nBatch);

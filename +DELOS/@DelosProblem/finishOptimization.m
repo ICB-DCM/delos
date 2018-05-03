@@ -11,12 +11,6 @@ function this = finishOptimization(this, Optimizer, Results, iteration, funCount
     % Recompute objective function value at final parameter on whole batch,
     % if minibatching mode was used
     if Optimizer.minibatching
-        % Get whole dataset first
-        wholeData = sort(this.miniBatchIndices{1});
-        for iBatch = 2 : length(this.miniBatchIndices)
-            wholeData = union(wholeData, this.miniBatchIndices{iBatch});
-        end
-        
         % Count, how many datapoints were used
         usedData = numel(this.miniBatchIndices{1});
         for iBatch = 2 : iteration
@@ -24,7 +18,7 @@ function this = finishOptimization(this, Optimizer, Results, iteration, funCount
         end
         
         % Assign results
-        Optimizer = Optimizer.callObjectiveFunction(this, wholeData, 1);
+        Optimizer = Optimizer.callObjectiveFunction(this, this.dataSetIndices, 1);
         this.finalObj = Optimizer.curJ;
         this.epochCount = ceil(usedData / numel(wholeData));
     else
