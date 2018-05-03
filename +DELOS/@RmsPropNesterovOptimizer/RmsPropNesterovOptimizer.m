@@ -2,7 +2,7 @@ classdef RmsPropNesterovOptimizer < DELOS.GeneralOptimizer
     % DelosProblem carries all niformation about a given optimization
     % problem which is to be solved by DeLOS
 
-    properties ( GetAccess = 'protected', SetAccess = 'private' )
+    properties ( GetAccess = 'public', SetAccess = 'protected' )
         % current information on Momentum
         curM;
         
@@ -47,8 +47,8 @@ classdef RmsPropNesterovOptimizer < DELOS.GeneralOptimizer
         
         function this = lookAhead(this, Options, iteration)
             % Hyperparameters for the momentum (increasing over time until t = tau)
-            alphaFactor = min(Options.alphaMin, Options.alphaMax + ...
-                          (iteration - 1) * (Options.alphaMin - Options.alphaMax) / Options.tauAlpha);
+            alphaFactor = min(Options.alphaMax, Options.alphaMin + ...
+                          (iteration - 1) * (Options.alphaMax - Options.alphaMin) / Options.tauAlpha);
 
             % Write new velocity and update parameters
             newV = 0.5 * alphaFactor * this.curV;
@@ -56,13 +56,13 @@ classdef RmsPropNesterovOptimizer < DELOS.GeneralOptimizer
             newTheta = this.curPar + newV;
             
             % Update momentum and velocity
-            this.oldPar = this.curPar;
-            this.oldV   = this.curV;
-            this.oldM   = this.curM;
+%             this.oldPar = this.curPar;
+%             this.oldV   = this.curV;
+%             this.oldM   = this.curM;
             
             this.curPar = newTheta;
-            this.curV   = newV;
-            this.curM   = newM;
+%             this.curV   = newV;
+%             this.curM   = newM;
         end
         
         function this = doParameterStep(this, Options, iteration)
@@ -86,8 +86,8 @@ classdef RmsPropNesterovOptimizer < DELOS.GeneralOptimizer
             %   * delta: small positive number to stabilize step for small R
 
             % Hyperparameters for the momentum (increasing over time until t = tau)
-            alphaFactor = min(Options.alphaMin, Options.alphaMax + ...
-                          (iteration - 1) * (Options.alphaMin - Options.alphaMax) / Options.tauAlpha);
+            alphaFactor = min(Options.alphaMax, Options.alphaMin + ...
+                          (iteration - 1) * (Options.alphaMax - Options.alphaMin) / Options.tauAlpha);
 
             % Hyperparamters for RMS prop (decay rate and stabilization
             delta     = repmat(Options.delta, [length(this.curPar) 1]);

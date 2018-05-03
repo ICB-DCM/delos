@@ -47,6 +47,7 @@ classdef GeneralOptimizer < matlab.mixin.CustomDisplay
         end
         
         function this = checkConvergence(this, Options)
+            this.trScale = min(this.trScale * 1.5, 1.0);
             this = this;
         end
     

@@ -33,7 +33,7 @@ function Results = runOptimization(this, Options)
         
         if ~Optimizer.acceptStep
             % Try to resolve the problem with the parameter step
-            [Optimizer, attempt] = Optimizer.intercept(Options, [this.lowerBounds, this.upperBounds]);
+            [Optimizer, attempt] = Optimizer.intercept(this, Options, iStep);
             funCount = funCount + attempt;
             
             % check, if step could be recaptured
@@ -42,16 +42,6 @@ function Results = runOptimization(this, Options)
             	break;
             end
         end
-        
-        %% Update the results and finalize step
-        % Update short-term optimization history 
-        Optimizer.updateHistory();
-        
-        % Save the last parameter update
-        Results = Optimizer.saveStep(Results, iStep);
-        
-        % Print information of of the current step
-        Optimizer.printOutput(Options, Results, iStep);
         
         % Check if convergence criteria are met
         Optimizer = Optimizer.checkConvergence(Options);
@@ -65,6 +55,17 @@ function Results = runOptimization(this, Options)
         
         % Restrict parameters to feasible space if necessary
         Optimizer = Optimizer.restrictParameters([this.lowerBounds, this.upperBounds]);
+        
+        %% Update the results and finalize step
+        % Update short-term optimization history 
+        Optimizer.updateHistory();
+        
+        % Save the last parameter update
+        Results = Optimizer.saveStep(Results, iStep);
+        
+        % Print information of of the current step
+        Optimizer.printOutput(Options, Results, iStep);
+        
     end
 
     %% Save results and finalize optimization
