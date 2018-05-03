@@ -45,18 +45,19 @@ function varargout = logLikelihoodJakstatDelos(theta, amiData)
     if (nargout == 1)
         amiOptions.sensi = 0;
         sol = simulate_jakstat_delos([], theta, amiData.condition, amiData, amiOptions);
-        varargout{1} = sol.llh;  
+        varargout{1} = -sol.llh;  
     elseif (nargout == 2)
         amiOptions.sensi = 1;
         sol = simulate_jakstat_delos([], theta, amiData.condition, amiData, amiOptions);
-        varargout{1} = sol.llh;
-        varargout{2} = sol.sllh;
+        varargout{1} = -sol.llh;
+        varargout{2} = -sol.sllh;
     elseif (nargout == 3)
         error('Calling objective with 3 arguments, doesnt work!');
     end
     
     if sol.status ~= 0
-        error('ODE not integrable');
+        varargout{1} = inf;
+        varargout{2} = zeros(17,1);
     end
     
 end

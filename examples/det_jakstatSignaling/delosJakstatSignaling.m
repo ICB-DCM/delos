@@ -36,11 +36,6 @@ clear all;
 close all;
 clc;
 
-TextSizes.DefaultAxesFontSize = 14;
-TextSizes.DefaultTextFontSize = 18;
-set(0,TextSizes);
-addpath(genpath('../../grid_tools'));
-
 % Seed random number generator
 rng(0);
 
@@ -50,7 +45,7 @@ rng(0);
 % For a detailed description for the biological model see the referenced
 % papers on the JakStat signaling pathway by Swameye et al. and Schelker et
 % al.
-
+addpath('../../../Pesto/PESTO');
 [exdir,~,~]=fileparts(which('delosJakstatSignaling.m'));
 % amiwrap('jakstat_delos','jakstat_delos_syms', exdir);
 
@@ -69,156 +64,51 @@ amiData           = amidata(amiData);     % calling the AMICI routine
 % PESTO routines to work are created and set to convenient values
 
 % parameters
-parameters.min     = -5 * ones(17,1);
-parameters.max     =  3 * ones(17,1);
-parameters.max(5)  =  6;
-parameters.max(2)  =  6;
-parameters.min(10) = -7;
-parameters.min(4)  = -3;
-parameters.min(2)  = -3;
-parameters.number  = length(parameters.min);
-parameters.name    = {'log_{10}(p1)','log_{10}(p2)','log_{10}(p3)','log_{10}(p4)','log_{10}(init_{STAT})',...
-    'log_{10}(sp1)','log_{10}(sp2)','log_{10}(sp3)','log_{10}(sp4)','log_{10}(sp5)',...
-    'log_{10}(offset_{tSTAT})','log_{10}(offset_{pSTAT})','log_{10}(scale_{tSTAT})','log_{10}(scale_{pSTAT})',...
-    'log_{10}(\sigma_{pSTAT})','log_{10}(\sigma_{tSTAT})','log_{10}(\sigma_{pEpoR})'};
+lb     = -5 * ones(17,1);
+ub     =  3 * ones(17,1);
+ub(4)  =  6;
+ub(2)  =  6;
+lb(10) = -6;
+lb(4)  = -3;
+lb(2)  = -3;
 
 % Initial guess for the parameters
-par0 = bsxfun(@plus,parameters.min,bsxfun(@times,parameters.max ...
-       - parameters.min, lhsdesign(1000,parameters.number,'smooth','off')'));
-parameters.guess = par0(:,1:100);
+load('init.mat');
 
-% objective function
+% add the package
+addpath('../../');
+
+% define objective function and true parameter value
 objectiveFunction = @(theta) logLikelihoodJakstatDelos(theta, amiData);
 
-% PestoOptions
-options          = PestoOptions();
-options.trace    = false;
-options.proposal = 'uniform';
-options.obj_type = 'log-posterior';
-options.mode     = 'visual';
-options.localOptimizer = 'delos';
-options.localOptimizerSaveHessian = false;
-options.objOutNumber = 2;
 
-%% Perform optimization
-% A parameters optimization is performed within the bound defined in
-% parameters.min and .max in order to infer the unknown parameters from 
-% measurement data.
-
-% REMARK: The optimization in this case is rather challenging and the
-% box constraints in the parameter space are set generously. So
-% optimization will encounter many points in which the ODE can not be
-% evaluated, leading to warnings of the ODE simulator AMICI. This is normal
-% and not a bug. It just shows how paramter estimation can look like in
-% complicated situations.
-
-% Different parameter optimization methods are compared with each other.
-% The uncommented version is a simple multi-start local optimization.
-% A version with a hybrid optimization technique (MEIGO-ESS) is also
-% implemented and commented, as well as a purely global optimization scheme
-% (PSwarm). The two alternative (and global) optimization methods are run
-% three times, to ensure that the found optimum is indeed the global one.
-
-
-% Multi-start local optimization part
-options.n_starts = 20;
-    %% Optimizer settings
-    
-% options.localOptimizer = 'fmincon';
-% options.localOptimizerOptions = optimset(...
-%     'Algorithm', 'interior-point',...
-%     'GradObj', 'on',...
-%     'Display', 'iter', ... 'Hessian', 'on', ... uncomment this to use the Hessian for optimization 
-%     'MaxIter', 1000,...
-%     'TolFun', 1e-10,...
-%     'TolX', 1e-12,...
-%     'TolGrad', 1e-6,...
-%     'MaxFunEvals', 1000*parameters.number);
-
-    OptimizerOptions = struct(...
-                'minibatching', false,...
-                'miniBatchSize', 1, ...
-                'dataSetSize', 1, ...
-                'barrier', 'log-barrier', ... 'soft-barrier', ...
-                'display', 'console', ...
-                'restriction', true, ...
-                'reportInterval', 10, ...
-                'algorithm', 'rmspropnesterov', ...
-                'maxIter', 1000);
-           
-%     % rmsprop
-%     OptimizerOptions.method = 'rmsprop';
-%     OptimizerOptions.hyperparams = struct('rho', 0.9, ...
-%                 'delta', 1e-8, ...
-%                 'eps0', 0.5, ...
-%                 'epsTau', 0.001, ...
-%                 'tau', 30);
-%     options.localOptimizerOptions = OptimizerOptions;
-            
-    % rmspropnesterov      
-    OptimizerOptions.rho = 0.5;
-    OptimizerOptions.etaMin = 1e-4;
-    OptimizerOptions.etaMax = 0.1;
-    OptimizerOptions.tau = 750;
-    OptimizerOptions.alphaMin = 0.5;
-    OptimizerOptions.alphaMax = 0.8;
-    OptimizerOptions.tauAlpha = 500;
-    OptimizerOptions.delta = 1e-8;
-    options.localOptimizerOptions = OptimizerOptions;
-    
-%     % adam
-%     OptimizerOptions.method = 'adam';
-%     OptimizerOptions.hyperparams = struct(...
-%                 'rho1', 0.5, ...
-%                 'rho2', 0.5, ...
-%                 'delta', 1e-8, ...
-%                 'tau', 1000, ...
-%                 'epsTau', 1e-5, ...
-%                 'eps0', 0.1);
-%     options.localOptimizerOptions = OptimizerOptions;
-
-%    % adadelta
-%     OptimizerOptions.method = 'adadelta';
-%     OptimizerOptions.hyperparams = struct(...
-%                 'rho', 0.5, ...
-%                 'eps0', 0.1, ...
-%                 'delta0', 0.01, ...
-%                 'deltaTau', 0.01, ...
-%                 'tau', 30);
-%     options.localOptimizerOptions = OptimizerOptions;
-    
 % Run getMultiStarts
 fprintf('\n Perform optimization...');
 
-parametersMultistart = getMultiStarts(parameters, objectiveFunction, options);
-% parametersHybrid = getMultiStarts(parameters, objectiveFunction, optionsPestoHybrid);
-% parametersGlobal = getMultiStarts(parameters, objectiveFunction, optionsPestoGlobal);
+% set options
+options = struct(...
+    'algorithm', 'rmspropnesterov', ...
+    'display', 'console', ...
+    'minibatching', false, ...
+    'etaMax', 1e-1, ...
+    'etaMin', 1e-4, ...
+    'tau', 750, ...
+    'restriction', true, ...
+    'reportInterval', 10, ...
+    'barrier', 'none', ...
+    'alphaMin', 0.5, ...
+    'alphaMax', 0.9, ...
+    'tauAlpha', 500, ...
+    'rho', 0.5, ...
+    'delta', 1e-7, ...
+    'maxIter', 1000);
 
+% initial guess
+initGuess = init;
 
+for iStart = 5
+    Results(iStart) = delos(objectiveFunction, lb, ub, initGuess(:,iStart), options);
+end
 
-% Potential saddle point
-%   -1.943355477763406
-%    4.913402094320207
-%    2.351603488675105
-%    0.820884647705983
-%    0.262561170015936
-%   -2.983772811428075
-%   -0.276241067539346
-%   -0.064592894685342
-%   -0.432189036666338
-%    0.121711510766994
-%   -0.119936148611484
-%   -0.156923571853729
-%   -2.902336048389599
-%   -3.710439632611835
-%   -0.642247167746234
-%   -0.884005082489238
-%   -1.192900004464454
-
-%% Perform uncertainty analysis
-% The uncertainty of the estimated parameters is visualized by computing
-% and plotting profile likelihoods. Different mathod can be used.
-
-% Use the hybrid approach for profiles: uncomment this, if wanted
-% optionsPesto.profile_method = 'integration';
+display(Results);
 
