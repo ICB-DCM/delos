@@ -20,7 +20,7 @@ function this = finishOptimization(this, Optimizer, Results, iteration, funCount
         % Assign results
         Optimizer = Optimizer.callObjectiveFunction(this, this.dataSetIndices, 1);
         this.finalObj = Optimizer.curJ;
-        this.epochCount = ceil(usedData / numel(wholeData));
+        this.epochCount = ceil(usedData / numel(this.dataSetIndices));
     else
         this.epochCount = iteration;
     end

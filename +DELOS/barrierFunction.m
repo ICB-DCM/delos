@@ -101,7 +101,7 @@ function [objective, gradient] = logBarrier(objective, gradient, theta, bounds, 
 % log-posterior, i.e. it is made for minimizing.
 
     % Scaling for barrier, which takes iteration into account
-    scale = 8*(iteration/maxIter) + 2;
+    scale = 8*(iteration/maxIter) + 5;
     scale = 10^scale;
     
     % Correct parameters, if the bounds were violated
@@ -115,6 +115,6 @@ function [objective, gradient] = logBarrier(objective, gradient, theta, bounds, 
     barrObjective = - sum(1/scale * log(parabola));
     barrGradient = - 1/scale * (2*theta - theta.*(bounds(:,1)+bounds(:,2))) ./ ((theta - bounds(:,1)) .* (theta - bounds(:,2)));
     
-    objective = objective + barrObjective;
-    gradient  = gradient  + barrGradient;
+    objective = objective - barrObjective;
+    gradient  = gradient  - barrGradient;
 end

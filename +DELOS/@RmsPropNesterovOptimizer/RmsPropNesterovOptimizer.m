@@ -96,7 +96,8 @@ classdef RmsPropNesterovOptimizer < DELOS.GeneralOptimizer
             % Learning rate, similar to simple SGD, decreasing over time
             tmpFactor = min(1, iteration/Options.tau); % Alpha is a Matlab keyword
             eta       = ((1 - tmpFactor) * Options.etaMax + tmpFactor * Options.etaMin);
-
+            % eta = 0.5 * (eta + Options.etaMax / iteration);
+            
             % Write new velocity and update parameters
             newM = rho * this.curM + (1 - rho) * (this.curG).^2;
             newV = alphaFactor * this.curV - eta * ((this.curG )./ (sqrt(newM) + delta));

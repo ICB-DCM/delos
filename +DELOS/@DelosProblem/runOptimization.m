@@ -37,7 +37,7 @@ function Results = runOptimization(this, Options)
             funCount = funCount + attempt;
             
             % check, if step could be recaptured
-            if ~Optimizer.acceptStep
+            if ~Optimizer.acceptStep || Optimizer.trScale < 1e-20
                 Optimizer.abortOptimization();
             	break;
             end

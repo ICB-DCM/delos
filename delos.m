@@ -18,13 +18,13 @@ function Results = delos(varargin)
         Options = DelosOptions();
 
         if (nargin < 4)
-            % Create initial guess
-            initGuess = 0.5 * (lowerBounds + upperBounds);
-
             if (nargin < 3)
                 % Not enough input arguments
                 error('Not enough input arguments! DeLOS needs at least 3 input arguments (cost function, lower bounds, upper bounds) to work.');
             end
+
+            % Create initial guess
+            initGuess = 0.5 * (varargin{2} + varargin{3});
         else
             initGuess = varargin{4};
         end
