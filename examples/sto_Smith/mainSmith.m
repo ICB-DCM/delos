@@ -19,7 +19,7 @@ theta = log10(pnom(:));
 dataSetSize = 100;
 
 % Recreate new dataset?
-writeNewData = false; % true
+writeNewData = true; % true
 
 if writeNewData
     writeData_Smith(dataSetSize);
@@ -35,16 +35,15 @@ amiOptions.quad_rtol = 1e-7;
 
 % add the package
 addpath('../../');
-data = getArtificialData_Smith();
-con0 = getConditions_Smith();
-timepoints = 1:10;
-data = data(1:dataSetSize,:,:);
-con0 = con0(:,1:dataSetSize);
-% define objective function and true parameter value
-objectiveFunction = @(x, miniBatch) logLikelihoodSmith(x, data, con0, timepoints, miniBatch);
-% objectiveFunction = @(x, miniBatch) llhSmith(x, miniBatch, amiData, amiOptions, dataSetSize);
 
-[l,g] = objectiveFunction(theta, 1);
+% define objective function and true parameter value
+% data = getArtificialData_Smith();
+% con0 = getConditions_Smith();
+% timepoints = 1:10;
+% data = data(1:dataSetSize,:,:);
+% con0 = con0(:,1:dataSetSize);
+% objectiveFunction = @(x, miniBatch) logLikelihoodSmith(x, data, con0, timepoints, miniBatch);
+objectiveFunction = @(x, miniBatch) llhSmith(x, miniBatch, amiData, amiOptions, dataSetSize);
 
 % set options
 options = struct(...

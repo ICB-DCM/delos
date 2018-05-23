@@ -11,7 +11,7 @@ function writeData_Smith(nMeasure)
     load('Smith2013_pnom.mat', 'pnom')
     theta = log10(pnom(:));
     sigmaCon = 1;
-    sigmaObs = 0.5;
+    sigmaObs = 0.05;
     nObs = 5;
 
     %% Creation of initial concentrations
@@ -32,8 +32,8 @@ function writeData_Smith(nMeasure)
    
     for iMeasure = 1 : nMeasure                
         sol = simulate_Smith(tout, theta, con0(:,iMeasure), [], ami_options);
-        noise = normrnd(0, sigmaObs, length(nTimepoints), nObs);
-        y_m(:,:,iMeasure) = sol.y; % + noise;
+        noise = normrnd(0, sigmaObs, nTimepoints, nObs);
+        y_m(:,:,iMeasure) = sol.y + noise;
     end
     
     %% Create an amidata object out of it and save

@@ -34,8 +34,11 @@ function varargout = llhSmith(theta, miniBatch, amiData, amiOptions, datasetSize
 
 %% AMICI
 % Setting the options for the AMICI solver
+amiOptions.rtol = 1e-7;
+amiOptions.atol = 1e-10;
+amiOptions.quad_rtol = 1e-7;
+amiOptions.quad_atol = 1e-10;
 amiOptions.sensi_meth = 'adjoint';
-amiOptions.pscale = 'log10';
 
 % Preallocate
 J = 0;
@@ -51,8 +54,10 @@ for iMeasure = miniBatch
     % Create amidata object
     amiD.t = amiData(iMeasure).t;
     amiD.Y = squeeze(amiData(iMeasure).Y);
+    amiD.Y(1,:) = nan(1,5);
     amiD.condition = amiData(iMeasure).condition;
     amiD = amidata(amiD);
+    amiD.Sigma_Y = 0.05 * ones(9,5);
     
     % Simulation
     if (nargout == 1)
@@ -61,7 +66,7 @@ for iMeasure = miniBatch
         J = J + sol.llh;  
     elseif (nargout == 2)
         amiOptions.sensi = 1;
-        sol = simulate_Smith(amiData(iMeasure).t, theta, amiData(iMeasure).condition, amiData(iMeasure), amiOptions);
+        sol = simulate_Smith(amiD.t, theta, amiD.condition, amiD, amiOptions);
         J = J + sol.llh;
         gradJ = gradJ + sol.sllh;
     else
