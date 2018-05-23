@@ -13,7 +13,7 @@ classdef GeneralOptions < matlab.mixin.CustomDisplay
         minibatching = true;
         
         % Barrier function for box-constraints
-        barrier = 'log-barrier';
+        barrier = 'none';
         
         % Restriction to box-constraints, if barrier is not enough?
         restriction = true;

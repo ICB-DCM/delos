@@ -38,6 +38,10 @@ classdef RmsPropNesterovOptimizer < DELOS.GeneralOptimizer
         
         function this = resetOldState(this)
             % reset old state again
+            if isempty(this.oldPar)
+                % Failed at inital point
+                error('Objective function evaluation failed at initial point. Aborting optimization!')
+            end
             this.curPar = this.oldPar;
             this.curJ   = this.oldJ;
             this.curG   = this.oldG;
