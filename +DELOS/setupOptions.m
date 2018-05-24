@@ -1,47 +1,47 @@
-function output = setupOptions(input)
+function optionsOut = setupOptions(optionsIn)
 
     % Check input
     if (nargin == 0)
         error('Not enough input arguments to create a DelosOptions object from it!');
     end
 
-    if ischar(input)
-        switch input
+    if ischar(optionsIn)
+        switch optionsIn
             case 'adadelta'
-                output = DELOS.AdadeltaOptions;
+                optionsOut = DELOS.AdadeltaOptions;
             case 'adam'
-                output = DELOS.AdamOptions;
+                optionsOut = DELOS.AdamOptions;
             case 'rmsprop'
-                output = DELOS.RmsPropOptions;
+                optionsOut = DELOS.RmsPropOptions;
             case 'rmspropnesterov'
-                output = DELOS.RmsPropNesterovOptions;
+                optionsOut = DELOS.RmsPropNesterovOptions;
             otherwise
                 error('Unknown optimizer!');
         end
     
-    elseif (isa(input,'AdadeltaOptions'))
-        output = DELOS.AdadeltaOptions(input);
+    elseif (isa(optionsIn,'AdadeltaOptions'))
+        optionsOut = DELOS.AdadeltaOptions(optionsIn);
         
-    elseif (isa(input,'AdamOptions'))
-        output = DELOS.AdamOptions(input);
+    elseif (isa(optionsIn,'AdamOptions'))
+        optionsOut = DELOS.AdamOptions(optionsIn);
         
-    elseif (isa(input,'RmsPropOptions'))
-        output = DELOS.RmsPropOptions(input);
+    elseif (isa(optionsIn,'RmsPropOptions'))
+        optionsOut = DELOS.RmsPropOptions(optionsIn);
         
-    elseif (isa(input,'RmsPropNesterovOptions'))
-        output = DELOS.RmsPropNesterovOptions(input);
+    elseif (isa(optionsIn,'RmsPropNesterovOptions'))
+        optionsOut = DELOS.RmsPropNesterovOptions(optionsIn);
         
-    elseif (isa(input,'struct'))
-        if isfield(input, 'algorithm')
-            switch input.algorithm
+    elseif (isa(optionsIn,'struct'))
+        if isfield(optionsIn, 'algorithm')
+            switch optionsIn.algorithm
                 case 'adadelta'
-                    output = DELOS.AdadeltaOptions(input);
+                    optionsOut = DELOS.AdadeltaOptions(optionsIn);
                 case 'adam'
-                    output = DELOS.AdamOptions(input);
+                    optionsOut = DELOS.AdamOptions(optionsIn);
                 case 'rmsprop'
-                    output = DELOS.RmsPropOptions(input);
+                    optionsOut = DELOS.RmsPropOptions(optionsIn);
                 case 'rmspropnesterov'
-                    output = DELOS.RmsPropNesterovOptions(input);
+                    optionsOut = DELOS.RmsPropNesterovOptions(optionsIn);
                 otherwise
                     error('Unknown optimizer!');
             end
@@ -51,6 +51,13 @@ function output = setupOptions(input)
         
     else
         error('The given input is neither a string, nor a struct, nor an Options object. DeLOS can not create an options object from that, sorry!');
+    end
+    
+    % create learning rate, if not done yet
+    if (~isfield(optionsIn, 'learningRate') || isempty(optionsIn.learningRate))
+        optionsOut = optionsOut.generateLearningRate();
+    else
+        optionsOut = optionsOut.setLearningRate(optionsIn.learningRate);
     end
     
 end

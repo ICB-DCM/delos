@@ -33,12 +33,26 @@ classdef GeneralOptions < matlab.mixin.CustomDisplay
         
         % After how many iteraions should DeLOS report the progress
         reportInterval = 1;
+        
+        % Learning rate
+        learningRate = [];
     end
     
     methods
         function output = GeneralOptions()
         end
+       
+        function this = generateLearningRate(this)
+            this.learningRate = zeros(this.maxIter, 1);
+            for iStep = 1 : this.maxIter
+                tmpFactor = min(1, iStep/this.tau);
+                this.learningRate(iStep) = ((1 - tmpFactor) * this.etaMax + tmpFactor * this.etaMin);
+            end
+        end
         
+        function this = setLearningRate(this, learningRate)
+            this.learningRate = learningRate;
+        end
     end
 
 end

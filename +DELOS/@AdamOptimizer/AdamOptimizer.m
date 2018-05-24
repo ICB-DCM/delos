@@ -72,8 +72,7 @@ classdef AdamOptimizer < DELOS.GeneralOptimizer
             rho2      = Options.rho2;
 
             % Learning rate, similar to simple SGD, decreasing over time
-            tmpFactor = min(1, iteration/Options.tau); % Alpha is a Matlab keyword
-            eta       = ((1 - tmpFactor) * Options.etaMax + tmpFactor * Options.etaMin);
+            eta       = Options.learningRate(iteration);
             % eta = 0.5 * (eta + Options.etaMax / iteration);
             
             % Write new velocity and update parameters
