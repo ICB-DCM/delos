@@ -36,9 +36,10 @@ function Results = runOptimization(this, Options)
             [Optimizer, attempt] = Optimizer.intercept(this, Options, iStep);
             funCount = funCount + attempt;
             
-            % check, if step could be recaptured
-            if ~Optimizer.acceptStep || Optimizer.trScale < 1e-20
-                Optimizer.abortOptimization();
+            % Check, if step could be recaptured
+            if ~Optimizer.acceptStep || Optimizer.trScale < 1e-16
+                % Abort optimization process, if it can not be recovered
+                this = this.abortOptimization(Optimizer, Results, iStep, funCount);
             	break;
             end
         end
@@ -69,8 +70,10 @@ function Results = runOptimization(this, Options)
     end
 
     %% Save results and finalize optimization
-    % finish up optimization
-    this = this.finishOptimization(Optimizer, Results, iStep, funCount);
+    % finish up optimization (if not aborted)
+    if ~(this.exitflag < 0)
+         this = this.finishOptimization(Optimizer, Results, iStep, funCount);
+    end
     
     % Create output results
     Results = this.saveResults(Results);

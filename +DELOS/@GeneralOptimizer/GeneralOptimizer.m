@@ -50,7 +50,7 @@ classdef GeneralOptimizer < matlab.mixin.CustomDisplay
             this.trScale = min(this.trScale * 1.5, 1.0);
             this = this;
         end
-    
+
         function this = updateHistory(this)
         end
         
@@ -59,9 +59,6 @@ classdef GeneralOptimizer < matlab.mixin.CustomDisplay
             Results.normGradTrace(iteration) = norm(this.curG);
             Results.parameterChangeTrace(iteration) = norm(this.curPar-this.oldPar);
             Results.parameterTrace(:,iteration) = this.curPar;
-        end
-        
-        function Results = saveResults(Results)
         end
     end
     
