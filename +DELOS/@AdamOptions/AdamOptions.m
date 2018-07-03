@@ -50,7 +50,7 @@ classdef AdamOptions < DELOS.GeneralOptions
                     if isprop(output, inputfields{iField})
                         output.(inputfields{iField}) = input.(inputfields{iField});
                     else
-                        error(['Can not assign property ' field ' to an instance of AdamOptions.']);
+                        error(['Can not assign property ' inputfields{iField} ' to an instance of AdamOptions.']);
                     end
                 end
                 
