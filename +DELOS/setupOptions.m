@@ -15,6 +15,8 @@ function optionsOut = setupOptions(optionsIn)
                 optionsOut = DELOS.RmsPropOptions;
             case 'rmspropnesterov'
                 optionsOut = DELOS.RmsPropNesterovOptions;
+            case 'retbfgs'
+                optionsOut = DELOS.RetBfgsOptions;
             otherwise
                 error('Unknown optimizer!');
         end
@@ -31,6 +33,9 @@ function optionsOut = setupOptions(optionsIn)
     elseif (isa(optionsIn,'RmsPropNesterovOptions'))
         optionsOut = DELOS.RmsPropNesterovOptions(optionsIn);
         
+    elseif (isa(optionsIn,'RetBfgsOptions'))
+        optionsOut = DELOS.RetBfgsOptions(optionsIn);
+        
     elseif (isa(optionsIn,'struct'))
         if isfield(optionsIn, 'algorithm')
             switch optionsIn.algorithm
@@ -42,6 +47,8 @@ function optionsOut = setupOptions(optionsIn)
                     optionsOut = DELOS.RmsPropOptions(optionsIn);
                 case 'rmspropnesterov'
                     optionsOut = DELOS.RmsPropNesterovOptions(optionsIn);
+                case 'retbfgs'
+                    optionsOut = DELOS.RetBfgsOptions(optionsIn);
                 otherwise
                     error('Unknown optimizer!');
             end
