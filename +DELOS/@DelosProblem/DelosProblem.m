@@ -85,6 +85,10 @@ classdef DelosProblem < matlab.mixin.CustomDisplay
                     Optimizer = DELOS.RmsPropOptimizer();
                 case 'rmspropnesterov'
                     Optimizer = DELOS.RmsPropNesterovOptimizer();
+                case 'vanillasgd'
+                    Optimizer = DELOS.VanillaSGDOptimizer();
+                case 'vanillasag'
+                    Optimizer = DELOS.VanillaSAGOptimizer();
                 case 'retbfgs'
                     Optimizer = DELOS.RetBfgsOptimizer();
             end

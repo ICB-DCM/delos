@@ -15,6 +15,10 @@ function optionsOut = setupOptions(optionsIn)
                 optionsOut = DELOS.RmsPropOptions;
             case 'rmspropnesterov'
                 optionsOut = DELOS.RmsPropNesterovOptions;
+            case 'vanillasgd'
+                optionsOut = DELOS.VanilaSGDOptions;
+            case 'vanillasag'
+                optionsOut = DELOS.VanilaSAGOptions;
             case 'retbfgs'
                 optionsOut = DELOS.RetBfgsOptions;
             otherwise
@@ -33,6 +37,12 @@ function optionsOut = setupOptions(optionsIn)
     elseif (isa(optionsIn,'RmsPropNesterovOptions'))
         optionsOut = DELOS.RmsPropNesterovOptions(optionsIn);
         
+    elseif (isa(optionsIn,'VanilaSGDOptions'))
+        optionsOut = DELOS.VanilaSGDOptions(optionsIn);
+        
+    elseif (isa(optionsIn,'VanilaSAGOptions'))
+        optionsOut = DELOS.VanilaSAGOptions(optionsIn);
+        
     elseif (isa(optionsIn,'RetBfgsOptions'))
         optionsOut = DELOS.RetBfgsOptions(optionsIn);
         
@@ -47,6 +57,10 @@ function optionsOut = setupOptions(optionsIn)
                     optionsOut = DELOS.RmsPropOptions(optionsIn);
                 case 'rmspropnesterov'
                     optionsOut = DELOS.RmsPropNesterovOptions(optionsIn);
+                case 'vanillasgd'
+                    optionsOut = DELOS.VanillaSGDOptions(optionsIn);
+                case 'vanillasag'
+                    optionsOut = DELOS.VanillaSAGOptions(optionsIn);
                 case 'retbfgs'
                     optionsOut = DELOS.RetBfgsOptions(optionsIn);
                 otherwise

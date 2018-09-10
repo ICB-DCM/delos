@@ -1,10 +1,10 @@
-classdef RmsPropOptions < DELOS.GeneralOptions
+classdef VanillaSGDOptions < DELOS.GeneralOptions
     % DelosProblem carries all niformation about a given optimization
     % problem which is to be solved by DeLOS
     
     properties ( GetAccess = 'public', SetAccess = 'private' )
         % Algorithm
-        algorithm = 'rmsprop';
+        algorithm = 'vanillasgd';
         
         % Maximum learning rate
         etaMax = 1e-1
@@ -15,15 +15,12 @@ classdef RmsPropOptions < DELOS.GeneralOptions
         % Decay time for learning rate
         tau;
         
-        % Memory parameter
-        rho = 0.9;
-        
         % Parameter for numerical stabilization
         delta = 1e-8;
     end
     
     methods
-        function output = RmsPropOptions(input)
+        function output = VanillaSGDOptions(input)
             % DelosOptions is the mother class for the individual solver
             % classes
             %
@@ -39,7 +36,7 @@ classdef RmsPropOptions < DELOS.GeneralOptions
                 input = struct();
             end
             
-            if(isa(input,'RmsPropNesterovOptions'))
+            if(isa(input,'VanillaSGDOptions'))
                 output = input;
             elseif(isa(input,'struct'))
                 inputfields = fields(input);
@@ -47,7 +44,7 @@ classdef RmsPropOptions < DELOS.GeneralOptions
                     if isprop(output, inputfields{iField})
                         output.(inputfields{iField}) = input.(inputfields{iField});
                     else
-                        error(['Can not assign property ' inputfields{iField} ' to an instance of RmsPropNesterovOptions.']);
+                        error(['Can not assign property ' inputfields{iField} ' to an instance of VanillaSGDOptions.']);
                     end
                 end
                 

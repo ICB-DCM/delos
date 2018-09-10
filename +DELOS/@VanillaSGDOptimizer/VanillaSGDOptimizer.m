@@ -1,17 +1,12 @@
-classdef RmsPropOptimizer < DELOS.GeneralOptimizer
+classdef VanillaSGDOptimizer < DELOS.GeneralOptimizer
     % DelosProblem carries all niformation about a given optimization
     % problem which is to be solved by DeLOS
 
     properties ( GetAccess = 'public', SetAccess = 'protected' )
-        % current information on gradient norm
-        curM;
-        
-        % old information on gradient norm
-        oldM;
     end
     
     methods
-        function output = RmsPropOptimizer()
+        function output = VanillaSGDOptimizer()
         end
         
         function this = initialize(this, nPar, minibatching)
@@ -23,8 +18,6 @@ classdef RmsPropOptimizer < DELOS.GeneralOptimizer
             this.minibatching = minibatching;
             
             % Initialize all solver specific values
-            this.curM = zeros(nPar,1);
-            this.oldM = zeros(nPar,1);
             this.nesterov = false;
         end
         
@@ -37,7 +30,6 @@ classdef RmsPropOptimizer < DELOS.GeneralOptimizer
             this.curPar = this.oldPar;
             this.curJ   = this.oldJ;
             this.curG   = this.oldG;
-            this.curM   = this.oldM;
         end
         
         function this = doParameterStep(this, Options, iteration)
@@ -61,24 +53,19 @@ classdef RmsPropOptimizer < DELOS.GeneralOptimizer
             %   * delta: small positive number to stabilize step for small R
 
             % Hyperparamters for RMS prop (decay rate and stabilization
-            delta     = repmat(Options.delta, [length(this.curPar) 1]);
-            rho       = Options.rho;
+            delta     = Options.delta;
 
             % Learning rate, similar to simple SGD, decreasing over time
             eta       = Options.learningRate(iteration);
-            % eta = 0.5 * (eta + Options.etaMax / iteration);
             
             % Write new velocity and update parameters
-            newM      = rho * this.curM + (1 - rho) * (this.curG).^2;
-            delTheta  = - eta * ((this.curG )./ (sqrt(newM) + delta));
+            delTheta  = - eta * ((this.curG ) / (norm(this.curG) + delta));
             newTheta  = this.curPar + delTheta * this.trScale;
             
             % Update momentum and velocity
             this.oldPar = this.curPar;
-            this.oldM   = this.curM;
             
             this.curPar = newTheta;
-            this.curM   = newM;
         end
     end
 
